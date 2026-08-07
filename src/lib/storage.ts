@@ -6,7 +6,7 @@ const KEYS = {
   settings: 'akasatana:settings',
 } as const;
 
-const HISTORY_LIMIT = 20;
+const HISTORY_LIMIT = 500;
 
 const DEFAULT_SETTINGS: Settings = {
   rareEnabled: true,

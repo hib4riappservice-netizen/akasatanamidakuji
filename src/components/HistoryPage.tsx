@@ -40,6 +40,13 @@ export function HistoryPage({ history, onClear, onBack }: HistoryPageProps) {
             <div className="flex shrink-0 items-center gap-1.5">
               <button
                 type="button"
+                onClick={() => setConfirming(false)}
+                className="rounded-lg border border-ink/20 px-2 py-1 text-xs text-ink/60"
+              >
+                キャンセル
+              </button>
+              <button
+                type="button"
                 onClick={() => {
                   onClear();
                   setConfirming(false);
@@ -47,13 +54,6 @@ export function HistoryPage({ history, onClear, onBack }: HistoryPageProps) {
                 className="rounded-lg bg-red-500 px-2 py-1 text-xs font-medium text-white"
               >
                 削除する
-              </button>
-              <button
-                type="button"
-                onClick={() => setConfirming(false)}
-                className="rounded-lg border border-ink/20 px-2 py-1 text-xs text-ink/60"
-              >
-                キャンセル
               </button>
             </div>
           ) : (

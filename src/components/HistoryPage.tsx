@@ -9,28 +9,62 @@ interface HistoryPageProps {
 
 function formatDateTime(timestamp: number): string {
   const d = new Date(timestamp);
-  const month = (d.getMonth() + 1).toString();
-  const date = d.getDate().toString();
+  const year = (d.getFullYear() % 100).toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const date = d.getDate().toString().padStart(2, '0');
   const hours = d.getHours().toString().padStart(2, '0');
   const minutes = d.getMinutes().toString().padStart(2, '0');
-  return `${month}/${date} ${hours}:${minutes}`;
+  return `${year}/${month}/${date}  ${hours}:${minutes}`;
 }
 
 export function HistoryPage({ history, onClear, onBack }: HistoryPageProps) {
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
-      <header className="flex shrink-0 items-center gap-2 border-b border-ink/10 bg-board-panel px-3 py-1.5">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label="戻る"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-lg text-ink/70 transition hover:bg-black/5 active:bg-black/10"
-        >
-          ←
-        </button>
-        <h1 className="text-base font-semibold text-ink">履歴（{history.length}）</h1>
+    <div className="flex h-full flex-col overflow-hidden">
+      <header className="flex shrink-0 items-center justify-between gap-2 border-b border-ink/10 bg-board-panel px-3 py-1.5">
+        <div className="flex min-w-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            aria-label="戻る"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-lg text-ink/70 transition hover:bg-black/5 active:bg-black/10"
+          >
+            ←
+          </button>
+          <h1 className="truncate text-base font-semibold text-ink">履歴（{history.length}）</h1>
+        </div>
+
+        {history.length > 0 &&
+          (confirming ? (
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  onClear();
+                  setConfirming(false);
+                }}
+                className="rounded-lg bg-red-500 px-2 py-1 text-xs font-medium text-white"
+              >
+                削除する
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirming(false)}
+                className="rounded-lg border border-ink/20 px-2 py-1 text-xs text-ink/60"
+              >
+                キャンセル
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirming(true)}
+              className="shrink-0 text-sm text-red-500 underline underline-offset-2"
+            >
+              全件クリア
+            </button>
+          ))}
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2">
@@ -49,43 +83,6 @@ export function HistoryPage({ history, onClear, onBack }: HistoryPageProps) {
           ))}
         </div>
       </div>
-
-      {history.length > 0 && (
-        <div className="shrink-0 border-t border-ink/10 bg-board-panel px-3 py-2">
-          {confirming ? (
-            <div className="flex items-center justify-end gap-2 text-sm">
-              <span className="text-ink/60">全件削除しますか？</span>
-              <button
-                type="button"
-                onClick={() => {
-                  onClear();
-                  setConfirming(false);
-                }}
-                className="rounded-lg bg-red-500 px-3 py-1.5 font-medium text-white"
-              >
-                削除する
-              </button>
-              <button
-                type="button"
-                onClick={() => setConfirming(false)}
-                className="rounded-lg border border-ink/20 px-3 py-1.5 text-ink/60"
-              >
-                キャンセル
-              </button>
-            </div>
-          ) : (
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={() => setConfirming(true)}
-                className="text-sm text-red-500 underline underline-offset-2"
-              >
-                全件クリア
-              </button>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

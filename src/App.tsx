@@ -209,7 +209,7 @@ function App() {
   }
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
+    <div className="flex h-full flex-col overflow-hidden">
       <div ref={topBarRef} className="shrink-0">
         <Header
           onOpenHistory={() => {

@@ -1,17 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+  --font-sans: "Klee One", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+  --font-gothic: "Zen Maru Gothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", system-ui, sans-serif;
+  --color-board: #eef1ec;
+  --color-board-panel: #ffffff;
+  --color-ink: #23262b;
+  --color-accent: #1d63ed;
+}
+
+.font-gothic {
+  font-family: var(--font-gothic);
+  letter-spacing: 0.08em;
 }
 
 html,
 body,
 #root {
   height: 100%;
+  overflow: hidden;
 }
 
 body {
-  background-color: #0b0b12;
-  color: #f5f5f7;
-  overscroll-behavior-y: contain;
+  font-family: var(--font-sans);
+  background-color: var(--color-board);
+  background-image:
+    radial-gradient(ellipse 320px 130px at 12% 15%, rgba(0, 0, 0, 0.025), transparent 70%),
+    radial-gradient(ellipse 280px 110px at 85% 30%, rgba(0, 0, 0, 0.02), transparent 70%),
+    radial-gradient(ellipse 260px 100px at 25% 85%, rgba(0, 0, 0, 0.02), transparent 70%),
+    linear-gradient(115deg, rgba(255, 255, 255, 0.5) 0%, transparent 30%, transparent 70%, rgba(255, 255, 255, 0.4) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  color: var(--color-ink);
+  overscroll-behavior: contain;
+}
+
+#root {
+  box-sizing: border-box;
+  border: 8px solid transparent;
+  border-image: linear-gradient(135deg, #dde1e5, #9aa0a8 30%, #eef0f2 55%, #7d838c 80%, #c7cbd1) 1;
 }

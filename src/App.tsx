@@ -1,17 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import poolData from './data/pool.json';
 import type { HistoryEntry, PoolData, Row, Settings } from './types';
 import { buildModifierPool, composeResultText, pickAmidaCandidates, pickRow } from './lib/draw';
 import { generateAmida, resolvePath, type AmidaBoard } from './lib/amida';
-import { TIMING_MS } from './lib/timing';
+import { SELECT_TIMEOUT_SEC, TIMING_MS } from './lib/timing';
 import {
   clearHistory as clearHistoryStorage,
   loadHistory,
-  loadNameHistory,
   loadSelectedCategories,
   loadSettings,
   pushHistory,
-  pushNameHistory,
   saveSelectedCategories,
   saveSettings,
 } from './lib/storage';
@@ -22,8 +20,10 @@ import { CategorySelector } from './components/CategorySelector';
 import { DrawButton } from './components/DrawButton';
 import { AmidaStage } from './components/AmidaStage';
 import { ResultDisplay, type RevealStage } from './components/ResultDisplay';
-import { HistoryPanel } from './components/HistoryPanel';
+import { HistoryPage } from './components/HistoryPage';
 import { SettingsModal } from './components/SettingsModal';
+
+const HISTORY_HASH = '#/history';
 
 const pool = poolData as PoolData;
 
@@ -51,22 +51,50 @@ function App() {
   );
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [history, setHistory] = useState<HistoryEntry[]>(() => loadHistory());
-  const [nameHistory, setNameHistory] = useState<string[]>(() => loadNameHistory());
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showHistoryPage, setShowHistoryPage] = useState(() => window.location.hash === HISTORY_HASH);
 
-  const [stage, setStage] = useState<Stage>('idle');
-  const [board, setBoard] = useState<AmidaBoard | null>(null);
-  const [candidates, setCandidates] = useState<string[]>([]);
-  const [startLine, setStartLine] = useState<number | null>(null);
-  const [resolvedEnd, setResolvedEnd] = useState<number | null>(null);
-  const [currentRow, setCurrentRow] = useState<Row | null>(null);
-  const [recentModifiers, setRecentModifiers] = useState<string[]>([]);
-  const [lastRowId, setLastRowId] = useState<string | null>(null);
+  // Measures the actual rendered height of the top bar (header + name + categories) so a
+  // matching invisible spacer can be reserved below `main`. That keeps the top bar in normal
+  // document flow (so it can never overlap the centered content below it) while still letting
+  // that content sit at the true vertical center of the viewport, since the space it centers
+  // within is now symmetric (top-bar-height reserved on both sides).
+  const topBarRef = useRef<HTMLDivElement>(null);
+  const [topBarHeight, setTopBarHeight] = useState(0);
+
+  useEffect(() => {
+    const el = topBarRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      setTopBarHeight(entries[0].contentRect.height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Lightweight hash routing for the history page — no router dependency needed for one extra screen.
+  useEffect(() => {
+    const onHashChange = () => setShowHistoryPage(window.location.hash === HISTORY_HASH);
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   const availableRows = settings.rareEnabled ? pool.rows : pool.rows.filter((r) => !r.rare);
   const modifierPool = buildModifierPool(
     pool.categories.filter((c) => selectedCategoryIds.includes(c.id)).map((c) => c.modifiers),
   );
+
+  const [stage, setStage] = useState<Stage>('idle');
+  const [board, setBoard] = useState<AmidaBoard>(() => generateAmida());
+  const [candidates, setCandidates] = useState<string[]>(() => pickAmidaCandidates(modifierPool, []));
+  const [currentRow, setCurrentRow] = useState<Row | null>(() =>
+    availableRows.length > 0 ? pickRow(availableRows, null) : null,
+  );
+  const [startLine, setStartLine] = useState<number | null>(null);
+  const [resolvedEnd, setResolvedEnd] = useState<number | null>(null);
+  const [recentModifiers, setRecentModifiers] = useState<string[]>([]);
+  const [lastRowId, setLastRowId] = useState<string | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(SELECT_TIMEOUT_SEC);
 
   function toggleCategory(id: string) {
     setSelectedCategoryIds((prev) => {
@@ -78,21 +106,23 @@ function App() {
     });
   }
 
-  function handleDraw() {
+  // Generates a brand new (freshly shuffled) ladder + candidates + row and opens the selection window.
+  function rollNewRound() {
     if (modifierPool.length === 0) return;
     const newCandidates = pickAmidaCandidates(modifierPool, recentModifiers, 4);
-    const newBoard = generateAmida(4, 10);
-    const row = pickRow(availableRows, lastRowId);
+    const newBoard = generateAmida();
+    const row = availableRows.length > 0 ? pickRow(availableRows, lastRowId) : null;
     setBoard(newBoard);
     setCandidates(newCandidates);
     setCurrentRow(row);
     setStartLine(null);
     setResolvedEnd(null);
+    setSecondsLeft(SELECT_TIMEOUT_SEC);
     setStage('choosing');
   }
 
   function handleSelectStart(index: number) {
-    if (stage !== 'choosing' || !board) return;
+    if (stage !== 'choosing') return;
     const end = resolvePath(board, index);
     setStartLine(index);
     setResolvedEnd(end);
@@ -103,6 +133,22 @@ function App() {
     if (stage === 'idle' || stage === 'choosing' || stage === 'result') return;
     setStage('result');
   }
+
+  // Selection countdown (F: 番号選択は10秒以内) — ticks while the ladder is choosable.
+  useEffect(() => {
+    if (stage !== 'choosing') return;
+    const id = window.setInterval(() => {
+      setSecondsLeft((s) => Math.max(0, s - 1));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [stage]);
+
+  // Auto-pick a random line once the countdown runs out, so a round always resolves.
+  useEffect(() => {
+    if (stage !== 'choosing' || secondsLeft > 0) return;
+    handleSelectStart(Math.floor(Math.random() * board.lineCount));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [secondsLeft, stage]);
 
   // Auto-advance through the fixed 4.0s reveal sequence (F-05-4).
   useEffect(() => {
@@ -132,7 +178,6 @@ function App() {
     const text = composeResultText(modifier, userName, currentRow);
     const entry: HistoryEntry = { id: makeId(), text, timestamp: Date.now(), rare: Boolean(currentRow.rare) };
     setHistory(pushHistory(entry));
-    setNameHistory(pushNameHistory(userName));
     setRecentModifiers((prev) => [modifier, ...prev].slice(0, 2));
     setLastRowId(currentRow.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,20 +196,49 @@ function App() {
   const showAmida = stage === 'choosing' || stage === 'tracing';
   const showResult = stage in RESULT_STAGE_MAP;
 
+  if (showHistoryPage) {
+    return (
+      <HistoryPage
+        history={history}
+        onClear={handleClearHistory}
+        onBack={() => {
+          window.location.hash = '';
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="flex min-h-dvh flex-col">
-      <Header onOpenSettings={() => setSettingsOpen(true)} />
-
-      <main className="flex-1 pb-6">
-        <NameInput value={userName} onChange={setUserName} nameHistory={nameHistory} />
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <div ref={topBarRef} className="shrink-0">
+        <Header
+          onOpenHistory={() => {
+            window.location.hash = HISTORY_HASH;
+          }}
+          onOpenSettings={() => setSettingsOpen(true)}
+        />
+        <NameInput value={userName} onChange={setUserName} />
         <CategorySelector categories={pool.categories} selectedIds={selectedCategoryIds} onToggle={toggleCategory} />
+      </div>
 
-        {showAmida && board && (
+      <main className="grid min-h-0 flex-1 place-items-center overflow-y-auto px-2">
+        {stage === 'idle' && (
+          <div className="flex flex-col items-center gap-5 px-6 text-center">
+            <div className="space-y-3">
+              <p className="text-lg leading-relaxed font-semibold text-ink/70">「引く」を押してスタート！</p>
+              <p className="text-sm leading-relaxed text-ink/40">押すとあみだくじが出るので、1〜4のどれかを選んでね</p>
+            </div>
+            <DrawButton label="引く" disabled={modifierPool.length === 0} onClick={rollNewRound} />
+          </div>
+        )}
+
+        {showAmida && (
           <AmidaStage
             board={board}
             candidates={candidates}
             stagePhase={stage === 'tracing' ? 'tracing' : 'choosing'}
             selectedStart={startLine}
+            secondsLeft={secondsLeft}
             reducedMotion={reducedMotion}
             onSelectStart={handleSelectStart}
             onSkip={handleSkip}
@@ -178,17 +252,14 @@ function App() {
             row={currentRow}
             stage={RESULT_STAGE_MAP[stage]}
             finished={stage === 'result'}
-            onDrawAgain={handleDraw}
+            onDrawAgain={rollNewRound}
             onSkip={handleSkip}
           />
         )}
-
-        <HistoryPanel history={history} onClear={handleClearHistory} />
       </main>
 
-      {stage === 'idle' && (
-        <DrawButton label="引く" disabled={modifierPool.length === 0} onClick={handleDraw} />
-      )}
+      {/* Mirrors the top bar's measured height so the space main centers within is vertically symmetric. */}
+      <div aria-hidden="true" className="shrink-0" style={{ height: topBarHeight }} />
 
       <SettingsModal
         open={settingsOpen}

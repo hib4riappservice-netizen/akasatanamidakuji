@@ -17,3 +17,6 @@ export const PHASE_END_MS = {
   pause: TIMING_MS.trace + TIMING_MS.modifierReveal + TIMING_MS.pause,
   rowReveal: TOTAL_DURATION_MS,
 } as const;
+
+/** Time limit for picking a start line before one is auto-selected. */
+export const SELECT_TIMEOUT_SEC = 10;

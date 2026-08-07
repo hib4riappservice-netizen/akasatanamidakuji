@@ -13,20 +13,20 @@ export function SettingsModal({ open, settings, onChange, onClearHistory, onClos
 
   return (
     <div
-      className="fixed inset-0 z-30 flex items-end justify-center bg-black/60 sm:items-center"
+      className="fixed inset-0 z-30 flex items-end justify-center bg-black/40 sm:items-center"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-t-2xl border border-white/10 bg-[#14141f] p-5 sm:rounded-2xl"
+        className="w-full max-w-md rounded-t-2xl border border-ink/15 bg-board-panel p-5 shadow-xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">設定</h2>
+          <h2 className="text-lg font-semibold text-ink">設定</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="閉じる"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:bg-white/10"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-ink/60 hover:bg-black/5"
           >
             ×
           </button>
@@ -47,7 +47,7 @@ export function SettingsModal({ open, settings, onChange, onClearHistory, onClos
           <button
             type="button"
             onClick={onClearHistory}
-            className="min-h-11 w-full rounded-xl border border-red-400/30 bg-red-500/10 text-sm font-medium text-red-300"
+            className="min-h-11 w-full rounded-xl border border-red-400/40 bg-red-50 text-sm font-medium text-red-600"
           >
             履歴を全削除
           </button>
@@ -67,21 +67,24 @@ function ToggleRow({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center justify-between gap-3">
-      <span className="text-sm text-white/80">{label}</span>
+    <div className="flex min-h-11 items-center justify-between gap-3">
+      <span className="text-sm text-ink/80">{label}</span>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
+        aria-label={label}
         onClick={() => onChange(!checked)}
-        className={`relative h-7 w-12 shrink-0 rounded-full transition ${checked ? 'bg-fuchsia-500' : 'bg-white/15'}`}
+        className={`relative h-7 w-12 shrink-0 rounded-full p-0 transition-colors ${
+          checked ? 'bg-accent' : 'bg-ink/25'
+        }`}
       >
         <span
-          className={`absolute top-0.5 h-6 w-6 rounded-full bg-white transition-transform ${
-            checked ? 'translate-x-5' : 'translate-x-0.5'
+          className={`absolute left-0.5 top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${
+            checked ? 'translate-x-5' : 'translate-x-0'
           }`}
         />
       </button>
-    </label>
+    </div>
   );
 }

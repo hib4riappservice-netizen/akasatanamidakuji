@@ -4,11 +4,9 @@ const KEYS = {
   categories: 'akasatana:selectedCategories',
   history: 'akasatana:history',
   settings: 'akasatana:settings',
-  nameHistory: 'akasatana:nameHistory',
 } as const;
 
 const HISTORY_LIMIT = 20;
-const NAME_HISTORY_LIMIT = 10;
 
 const DEFAULT_SETTINGS: Settings = {
   rareEnabled: true,
@@ -61,16 +59,4 @@ export function loadSettings(): Settings {
 
 export function saveSettings(settings: Settings): void {
   writeJson(KEYS.settings, settings);
-}
-
-export function loadNameHistory(): string[] {
-  return readJson(KEYS.nameHistory, []);
-}
-
-export function pushNameHistory(name: string): string[] {
-  const trimmed = name.trim();
-  if (!trimmed) return loadNameHistory();
-  const next = [trimmed, ...loadNameHistory().filter((n) => n !== trimmed)].slice(0, NAME_HISTORY_LIMIT);
-  writeJson(KEYS.nameHistory, next);
-  return next;
 }

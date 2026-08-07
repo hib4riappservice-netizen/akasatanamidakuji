@@ -9,13 +9,16 @@ interface AmidaStageProps {
   candidates: string[];
   stagePhase: StagePhase;
   selectedStart: number | null;
+  secondsLeft: number;
   reducedMotion: boolean;
   onSelectStart: (index: number) => void;
   onSkip: () => void;
 }
 
 const VIEW_W = 100;
-const VIEW_H = 140;
+const VIEW_H = 120;
+
+const CIRCLED_DIGITS = ['', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
 
 function lineX(i: number, lineCount: number): number {
   return ((i + 0.5) / lineCount) * VIEW_W;
@@ -63,6 +66,7 @@ export function AmidaStage({
   candidates,
   stagePhase,
   selectedStart,
+  secondsLeft,
   reducedMotion,
   onSelectStart,
   onSkip,
@@ -97,96 +101,113 @@ export function AmidaStage({
   const showPath = selectedStart !== null;
   const dAttr = showPath ? buildTravelerPathD(board, selectedStart) : '';
   const gridCols = { gridTemplateColumns: `repeat(${lineCount}, 1fr)` };
+  const urgent = stagePhase === 'choosing' && secondsLeft <= 3;
 
   return (
-    <div className="px-4 pt-4">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm font-medium text-white/70">
+    <div className="flex flex-col items-center gap-1 px-3 py-1">
+      <div className="flex h-12 w-full max-w-xs shrink-0 items-center justify-between sm:max-w-sm md:max-w-md lg:max-w-xl">
+        <span className="text-xs font-medium text-ink/70 sm:text-sm">
           {stagePhase === 'choosing' ? '番号を選んでね（1〜4）' : '結果を確認中…'}
         </span>
+        {stagePhase === 'choosing' && (
+          <span
+            className={`text-4xl font-black leading-none tabular-nums sm:text-5xl ${urgent ? 'animate-pulse text-red-500' : 'text-pink-500'}`}
+          >
+            {CIRCLED_DIGITS[secondsLeft]}
+          </span>
+        )}
         {stagePhase !== 'choosing' && (
           <button
             type="button"
             onClick={onSkip}
-            className="text-xs text-white/40 underline underline-offset-2 hover:text-white/60"
+            className="text-xs text-ink/40 underline underline-offset-2 hover:text-ink/60"
           >
             タップでスキップ
           </button>
         )}
       </div>
 
-      <div className="grid gap-1" style={gridCols}>
-        {Array.from({ length: lineCount }, (_, i) => (
-          <button
-            key={i}
-            type="button"
-            disabled={stagePhase !== 'choosing'}
-            onClick={() => onSelectStart(i)}
-            aria-label={`${i + 1}番でスタート`}
-            className={`mx-auto flex h-11 w-11 items-center justify-center rounded-full border text-base font-bold transition ${
-              selectedStart === i
-                ? 'border-fuchsia-400 bg-fuchsia-500/30 text-white'
-                : 'border-white/15 bg-white/5 text-white/70 hover:bg-white/10'
-            } disabled:cursor-default`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
-
-      <div
-        className="mt-2 w-full"
-        style={{ aspectRatio: `${VIEW_W} / ${VIEW_H}`, cursor: stagePhase !== 'choosing' ? 'pointer' : 'default' }}
-        onClick={stagePhase !== 'choosing' ? onSkip : undefined}
-      >
-        <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="h-full w-full" preserveAspectRatio="none">
+      <div className="flex w-full max-w-xs shrink-0 flex-col gap-1.5 rounded-2xl border border-ink/10 bg-board-panel p-2.5 shadow-sm sm:max-w-sm sm:p-3 md:max-w-md lg:max-w-xl">
+        <div className="grid shrink-0 gap-1" style={gridCols}>
           {Array.from({ length: lineCount }, (_, i) => (
-            <line
-              key={`line-${i}`}
-              x1={lineX(i, lineCount)}
-              y1={0}
-              x2={lineX(i, lineCount)}
-              y2={VIEW_H}
-              stroke="rgba(255,255,255,0.18)"
-              strokeWidth={1}
-            />
+            <button
+              key={i}
+              type="button"
+              disabled={stagePhase !== 'choosing'}
+              onClick={() => onSelectStart(i)}
+              aria-label={`${i + 1}番でスタート`}
+              className={`mx-auto flex h-9 w-9 items-center justify-center rounded-full border-2 text-base font-semibold transition sm:h-12 sm:w-12 sm:text-lg ${
+                selectedStart === i
+                  ? 'border-pink-500 bg-pink-100 text-pink-600'
+                  : 'border-ink/15 bg-board text-ink/70 hover:border-pink-400/50 hover:bg-pink-50'
+              } disabled:cursor-default`}
+            >
+              {i + 1}
+            </button>
           ))}
-          {board.rungs.map((r, idx) => (
-            <line
-              key={`rung-${idx}`}
-              x1={lineX(r.gap, lineCount)}
-              y1={rowMid(r.row, board.rowCount)}
-              x2={lineX(r.gap + 1, lineCount)}
-              y2={rowMid(r.row, board.rowCount)}
-              stroke="rgba(255,255,255,0.28)"
-              strokeWidth={1}
-            />
-          ))}
-          {showPath && (
-            <path
-              ref={pathRef}
-              d={dAttr}
-              fill="none"
-              stroke="rgba(232,121,249,0.55)"
-              strokeWidth={1.6}
-              strokeLinecap="round"
-            />
-          )}
-          {showPath && !reducedMotion && stagePhase === 'tracing' && (
-            <circle ref={markerRef} r={2.2} fill="#e879f9" />
-          )}
-        </svg>
-      </div>
+        </div>
 
-      <div className="mt-2 grid gap-1" style={gridCols}>
-        {candidates.map((mod, i) => (
-          <div
-            key={`${mod}-${i}`}
-            className="rounded-lg border border-white/10 bg-white/5 px-1 py-2 text-center text-xs leading-tight text-white/60"
+        <div
+          className="h-[clamp(8rem,26dvh,20rem)] w-full shrink-0"
+          style={{ cursor: stagePhase !== 'choosing' ? 'pointer' : 'default' }}
+          onClick={stagePhase !== 'choosing' ? onSkip : undefined}
+        >
+          <svg
+            viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
+            className="h-full w-full"
+            preserveAspectRatio="none"
           >
-            {mod}
-          </div>
-        ))}
+            {Array.from({ length: lineCount }, (_, i) => (
+              <line
+                key={`line-${i}`}
+                x1={lineX(i, lineCount)}
+                y1={0}
+                x2={lineX(i, lineCount)}
+                y2={VIEW_H}
+                stroke="rgba(35,38,43,0.3)"
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+            {board.rungs.map((r, idx) => (
+              <line
+                key={`rung-${idx}`}
+                x1={lineX(r.gap, lineCount)}
+                y1={rowMid(r.row, board.rowCount)}
+                x2={lineX(r.gap + 1, lineCount)}
+                y2={rowMid(r.row, board.rowCount)}
+                stroke="rgba(35,38,43,0.35)"
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))}
+            {showPath && (
+              <path
+                ref={pathRef}
+                d={dAttr}
+                fill="none"
+                stroke="rgba(236,72,153,0.8)"
+                strokeWidth={2.5}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
+            {showPath && !reducedMotion && stagePhase === 'tracing' && (
+              <circle ref={markerRef} r={2} fill="#ec4899" />
+            )}
+          </svg>
+        </div>
+
+        <div className="grid shrink-0 gap-1" style={gridCols}>
+          {candidates.map((mod, i) => (
+            <div
+              key={`${mod}-${i}`}
+              className="text-balance rounded-lg border border-ink/15 bg-board px-1.5 py-2 text-center text-[11px] leading-snug text-ink/70 sm:px-2 sm:text-sm"
+            >
+              {mod}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

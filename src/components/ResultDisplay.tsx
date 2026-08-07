@@ -31,79 +31,74 @@ export function ResultDisplay({ modifier, userName, row, stage, finished, onDraw
   }
 
   return (
-    <div className="px-4 pt-4">
-      {!finished && onSkip && (
-        <div className="mb-2 text-right">
-          <button
-            type="button"
-            onClick={onSkip}
-            className="text-xs text-white/40 underline underline-offset-2 hover:text-white/60"
-          >
-            タップでスキップ
-          </button>
-        </div>
-      )}
+    <div className="flex w-full max-w-xs flex-col gap-2 px-3 py-1 sm:max-w-sm md:max-w-md">
+      {/* Fixed-height slot so the skip link appearing/disappearing never shifts the layout. */}
+      <div className="h-5 text-right">
+        <button
+          type="button"
+          onClick={onSkip}
+          disabled={finished}
+          className={`text-xs underline underline-offset-2 transition-opacity ${
+            finished ? 'pointer-events-none opacity-0' : 'text-ink/40 opacity-100 hover:text-ink/60'
+          }`}
+        >
+          タップでスキップ
+        </button>
+      </div>
+
       <div
-        className={`rounded-2xl border p-5 text-center transition-all duration-300 ${
+        className={`relative flex min-h-32 flex-col items-center justify-center rounded-2xl border p-4 text-center transition-colors duration-300 ${
           rare
-            ? 'border-amber-300/70 bg-gradient-to-b from-amber-500/20 to-fuchsia-500/10 shadow-lg shadow-amber-400/20'
-            : 'border-white/10 bg-white/5'
+            ? 'border-amber-400/70 bg-amber-50 shadow-lg shadow-amber-300/30'
+            : 'border-dashed border-ink/20 bg-board-panel'
         }`}
       >
         {rare && (
-          <div className="mb-2 animate-pulse text-sm font-bold tracking-widest text-amber-300">
+          <div className="absolute top-3 left-0 w-full animate-pulse text-sm font-semibold tracking-widest text-amber-500">
             ✨ 激レア出現 ✨
           </div>
         )}
 
-        <p
-          className="font-bold text-white"
-          style={{ fontSize: 'clamp(1.5rem, 6vw, 2.5rem)', lineHeight: 1.3 }}
-        >
+        {/* This text never changes size/content across reveal stages (only opacity/scale animate), so it always sits dead-center. */}
+        <p className="font-semibold text-ink" style={{ fontSize: 'clamp(1.3rem, 5vw, 2.2rem)', lineHeight: 1.3 }}>
           <span>{modifier}{name}の</span>
           <span
             className={`inline-block transition-all duration-500 ${
               rowVisible ? 'scale-100 opacity-100' : 'scale-75 opacity-0'
-            } ${rare ? 'text-amber-300' : 'text-fuchsia-300'}`}
+            } ${rare ? 'text-amber-500' : 'text-pink-500'}`}
           >
-            {rowVisible ? row.label : ' '.repeat(5)}
+            {row.label}
           </span>
         </p>
 
-        {stage === 'pause' && <p className="mt-2 text-2xl text-white/40">……</p>}
-
-        {rowVisible && (
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-            {row.kana.map((k, i) => (
-              <span
-                key={i}
-                className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-sm text-white/60"
-              >
-                {k}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Absolutely positioned so the "……" beat never affects the centering/size of the text above. */}
+        <p
+          className={`absolute bottom-3 left-0 w-full text-2xl text-ink/40 transition-opacity duration-300 ${
+            stage === 'pause' ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          ……
+        </p>
       </div>
 
-      {finished && (
-        <div className="mt-3 flex gap-2">
-          <button
-            type="button"
-            onClick={onDrawAgain}
-            className="min-h-11 flex-1 rounded-xl bg-gradient-to-r from-fuchsia-500 to-violet-500 font-bold text-white active:scale-[0.98]"
-          >
-            もう一度引く
-          </button>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="min-h-11 rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-white/70 hover:bg-white/10"
-          >
-            {copied ? 'コピー済み' : 'コピー'}
-          </button>
-        </div>
-      )}
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={!finished}
+          onClick={onDrawAgain}
+          className="font-gothic min-h-11 flex-1 rounded-xl bg-pink-200 font-bold text-pink-700 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          もう一度引く
+        </button>
+        <button
+          type="button"
+          disabled={!finished}
+          onClick={handleCopy}
+          className="min-h-11 rounded-xl border border-ink/20 bg-board-panel px-4 text-sm text-ink/70 transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {copied ? 'コピー済み' : 'コピー'}
+        </button>
+      </div>
     </div>
   );
 }

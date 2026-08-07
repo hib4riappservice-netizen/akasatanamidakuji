@@ -14,7 +14,8 @@ export interface AmidaBoard {
 }
 
 const DEFAULT_LINE_COUNT = 4;
-const DEFAULT_ROW_COUNT = 10;
+/** High row count keeps the ladder visually dense/complex even though F-05 fixes the line count at 4. */
+const DEFAULT_ROW_COUNT = 16;
 const RUNG_PROBABILITY = 0.45;
 
 /**

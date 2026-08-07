@@ -4,7 +4,6 @@
     {
       "id": "voice",
       "label": "声色",
-      "emoji": "🎙️",
       "defaultOn": true,
       "modifiers": [
         "セクシーな",
@@ -42,7 +41,6 @@
     {
       "id": "chara",
       "label": "キャラ変",
-      "emoji": "🎭",
       "defaultOn": true,
       "modifiers": [
         "王様みたいな",
@@ -80,7 +78,6 @@
     {
       "id": "emo",
       "label": "エモ",
-      "emoji": "🌙",
       "defaultOn": true,
       "modifiers": [
         "明日引っ越す",
@@ -118,7 +115,6 @@
     {
       "id": "dame",
       "label": "ダメ人間",
-      "emoji": "😵",
       "defaultOn": true,
       "modifiers": [
         "借金まみれの",

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import poolData from './data/pool.json';
 import type { HistoryEntry, PoolData, Row, Settings } from './types';
 import { buildModifierPool, composeResultText, pickAmidaCandidates, pickRow } from './lib/draw';
@@ -53,24 +53,6 @@ function App() {
   const [history, setHistory] = useState<HistoryEntry[]>(() => loadHistory());
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showHistoryPage, setShowHistoryPage] = useState(() => window.location.hash === HISTORY_HASH);
-
-  // Measures the actual rendered height of the top bar (header + name + categories) so a
-  // matching invisible spacer can be reserved below `main`. That keeps the top bar in normal
-  // document flow (so it can never overlap the centered content below it) while still letting
-  // that content sit at the true vertical center of the viewport, since the space it centers
-  // within is now symmetric (top-bar-height reserved on both sides).
-  const topBarRef = useRef<HTMLDivElement>(null);
-  const [topBarHeight, setTopBarHeight] = useState(0);
-
-  useEffect(() => {
-    const el = topBarRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver((entries) => {
-      setTopBarHeight(entries[0].contentRect.height);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   // Lightweight hash routing for the history page — no router dependency needed for one extra screen.
   useEffect(() => {
@@ -132,6 +114,10 @@ function App() {
   function handleSkip() {
     if (stage === 'idle' || stage === 'choosing' || stage === 'result') return;
     setStage('result');
+  }
+
+  function handleGoHome() {
+    setStage('idle');
   }
 
   // Selection countdown (F: 番号選択は10秒以内) — ticks while the ladder is choosable.
@@ -210,7 +196,7 @@ function App() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div ref={topBarRef} className="shrink-0">
+      <div className="shrink-0">
         <Header
           onOpenHistory={() => {
             window.location.hash = HISTORY_HASH;
@@ -226,7 +212,7 @@ function App() {
           <div className="flex flex-col items-center gap-5 px-6 text-center">
             <div className="space-y-3">
               <p className="text-lg leading-relaxed font-semibold text-ink/70">「引く」を押してスタート！</p>
-              <p className="text-balance text-sm leading-relaxed text-ink/40">押すとあみだくじが出るので、1〜4のどれかを選んでね</p>
+              <p className="text-xs whitespace-nowrap text-ink/40 sm:text-sm">あみだくじが出るので、1〜4のどれかを選んでね</p>
             </div>
             <DrawButton label="引く" disabled={modifierPool.length === 0} onClick={rollNewRound} />
           </div>
@@ -253,13 +239,20 @@ function App() {
             stage={RESULT_STAGE_MAP[stage]}
             finished={stage === 'result'}
             onDrawAgain={rollNewRound}
+            onGoHome={handleGoHome}
             onSkip={handleSkip}
           />
         )}
       </main>
 
-      {/* Mirrors the top bar's measured height so the space main centers within is vertically symmetric. */}
-      <div aria-hidden="true" className="shrink-0" style={{ height: topBarHeight }} />
+      {/*
+        Fixed (not measured) to match the top bar's height, so the space `main` centers within
+        stays vertically symmetric without depending on runtime measurement — a JS-measured
+        version of this used to visibly jump when web fonts finished loading and the top bar's
+        rendered height changed underneath it.
+      */}
+      <div aria-hidden="true" className="hidden h-[163px] shrink-0 sm:block" />
+      <div aria-hidden="true" className="h-[199px] shrink-0 sm:hidden" />
 
       <SettingsModal
         open={settingsOpen}

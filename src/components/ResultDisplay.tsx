@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faCopy, faHouse } from '@fortawesome/free-solid-svg-icons';
 import type { Row } from '../types';
 
 export type RevealStage = 'modifier' | 'pause' | 'row';
@@ -10,10 +12,11 @@ interface ResultDisplayProps {
   stage: RevealStage;
   finished: boolean;
   onDrawAgain: () => void;
+  onGoHome: () => void;
   onSkip?: () => void;
 }
 
-export function ResultDisplay({ modifier, userName, row, stage, finished, onDrawAgain, onSkip }: ResultDisplayProps) {
+export function ResultDisplay({ modifier, userName, row, stage, finished, onDrawAgain, onGoHome, onSkip }: ResultDisplayProps) {
   const [copied, setCopied] = useState(false);
   const name = userName.trim().length > 0 ? userName.trim() : 'あなた';
   const rowVisible = stage === 'row';
@@ -59,17 +62,20 @@ export function ResultDisplay({ modifier, userName, row, stage, finished, onDraw
           </div>
         )}
 
-        {/* This text never changes size/content across reveal stages (only opacity/scale animate), so it always sits dead-center. */}
-        <p className="font-semibold text-ink" style={{ fontSize: 'clamp(1.3rem, 5vw, 2.2rem)', lineHeight: 1.3 }}>
-          <span>{modifier}{name}の</span>
-          <span
-            className={`inline-block transition-all duration-500 ${
+        {/* Always exactly 3 lines (modifier / name+の / row) so it never wraps at an awkward
+            point — content never changes across reveal stages (only opacity/scale animate),
+            so it always sits dead-center. */}
+        <div className="font-semibold text-ink" style={{ fontSize: 'clamp(1.3rem, 5vw, 2.2rem)', lineHeight: 1.3 }}>
+          <div>{modifier}</div>
+          <div>{name}の</div>
+          <div
+            className={`transition-all duration-500 ${
               rowVisible ? 'scale-100 opacity-100' : 'scale-75 opacity-0'
             } ${rare ? 'text-amber-500' : 'text-pink-500'}`}
           >
             {row.label}
-          </span>
-        </p>
+          </div>
+        </div>
 
         {/* Absolutely positioned so the "……" beat never affects the centering/size of the text above. */}
         <p
@@ -85,18 +91,28 @@ export function ResultDisplay({ modifier, userName, row, stage, finished, onDraw
         <button
           type="button"
           disabled={!finished}
-          onClick={onDrawAgain}
-          className="font-gothic min-h-11 flex-1 rounded-xl bg-pink-200 font-bold text-pink-700 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+          onClick={onGoHome}
+          aria-label="トップに戻る"
+          className="flex min-h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-ink/20 bg-board-panel text-ink/70 transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          もう一度引く
+          <FontAwesomeIcon icon={faHouse} className="h-4 w-4" />
         </button>
         <button
           type="button"
           disabled={!finished}
           onClick={handleCopy}
-          className="min-h-11 rounded-xl border border-ink/20 bg-board-panel px-4 text-sm text-ink/70 transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
+          aria-label="コピー"
+          className="flex min-h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-ink/20 bg-board-panel text-ink/70 transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {copied ? 'コピー済み' : 'コピー'}
+          <FontAwesomeIcon icon={copied ? faCheck : faCopy} className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          disabled={!finished}
+          onClick={onDrawAgain}
+          className="font-gothic min-h-11 flex-1 rounded-xl bg-pink-200 font-bold text-pink-700 transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          もう一度引く
         </button>
       </div>
     </div>

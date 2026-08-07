@@ -18,8 +18,6 @@ interface AmidaStageProps {
 const VIEW_W = 100;
 const VIEW_H = 120;
 
-const CIRCLED_DIGITS = ['', '①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'];
-
 function lineX(i: number, lineCount: number): number {
   return ((i + 0.5) / lineCount) * VIEW_W;
 }
@@ -111,9 +109,11 @@ export function AmidaStage({
         </span>
         {stagePhase === 'choosing' && (
           <span
-            className={`text-4xl font-black leading-none tabular-nums sm:text-5xl ${urgent ? 'animate-pulse text-red-500' : 'text-pink-500'}`}
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-[3px] text-xl font-black tabular-nums sm:h-12 sm:w-12 sm:text-2xl ${
+              urgent ? 'animate-pulse border-red-500 text-red-500' : 'border-pink-500 text-pink-500'
+            }`}
           >
-            {CIRCLED_DIGITS[secondsLeft]}
+            {secondsLeft}
           </span>
         )}
         {stagePhase !== 'choosing' && (

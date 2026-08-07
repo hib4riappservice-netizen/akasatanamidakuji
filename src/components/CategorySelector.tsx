@@ -8,7 +8,7 @@ interface CategorySelectorProps {
 
 export function CategorySelector({ categories, selectedIds, onToggle }: CategorySelectorProps) {
   return (
-    <div className="flex shrink-0 flex-wrap gap-2 px-4 py-2">
+    <div className="grid shrink-0 grid-cols-2 gap-2 px-4 py-2 sm:flex sm:flex-wrap">
       {categories.map((category) => {
         const active = selectedIds.includes(category.id);
         return (

@@ -3,7 +3,7 @@
   "categories": [
     {
       "id": "voice",
-      "label": "声色系",
+      "label": "声色",
       "emoji": "🎙️",
       "defaultOn": true,
       "modifiers": [
@@ -41,7 +41,7 @@
     },
     {
       "id": "chara",
-      "label": "キャラ変系",
+      "label": "キャラ変",
       "emoji": "🎭",
       "defaultOn": true,
       "modifiers": [
@@ -79,7 +79,7 @@
     },
     {
       "id": "emo",
-      "label": "エモ系",
+      "label": "エモ",
       "emoji": "🌙",
       "defaultOn": true,
       "modifiers": [
@@ -117,9 +117,9 @@
     },
     {
       "id": "dame",
-      "label": "ダメ人間系",
+      "label": "ダメ人間",
       "emoji": "😵",
-      "defaultOn": false,
+      "defaultOn": true,
       "modifiers": [
         "借金まみれの",
         "二度寝した",

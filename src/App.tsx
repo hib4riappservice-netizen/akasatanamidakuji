@@ -226,7 +226,7 @@ function App() {
           <div className="flex flex-col items-center gap-5 px-6 text-center">
             <div className="space-y-3">
               <p className="text-lg leading-relaxed font-semibold text-ink/70">「引く」を押してスタート！</p>
-              <p className="text-sm leading-relaxed text-ink/40">押すとあみだくじが出るので、1〜4のどれかを選んでね</p>
+              <p className="text-balance text-sm leading-relaxed text-ink/40">押すとあみだくじが出るので、1〜4のどれかを選んでね</p>
             </div>
             <DrawButton label="引く" disabled={modifierPool.length === 0} onClick={rollNewRound} />
           </div>

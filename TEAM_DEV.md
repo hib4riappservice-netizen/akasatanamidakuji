@@ -2,26 +2,35 @@
 
 PRESIDENT → boss1 → workers(git worktree) → boss1(マージ・レビュー) → PRESIDENT という自律開発フローを、tmux上の複数Claude Codeエージェントで実行する仕組み。
 
+## 💬 このリポジトリの管理をClaude Codeに続きから頼むには
+
+（PRESIDENT/boss1/workerではなく、このドキュメント自体の編集など`~/projects`横断のメンテナンスをClaude Codeに頼む場合の話）
+
+- 通常は何も言わなくてよい。`~/`（このプロジェクト群のメンテナンスで使っているホームディレクトリ）で起動したセッションなら、過去のやり取りから得た記憶(`MEMORY.md`)が自動的に読み込まれる
+- 特定の話題を確実に踏まえてほしい時は「〇〇の続きです、メモリを確認して」のように話題を添える
+- ⚠️ 記憶はセッションを起動したディレクトリ単位。`~/projects/akasatanamidakuji`など特定プロジェクトの中で`claude`を起動すると別スコープ扱いになり、この記憶は自動では読み込まれない。プロジェクト横断の相談は`~`や`~/projects`から起動すること
+
 ## 🚀 使い方
 
-### 毎回まずこれ
+### 1. セッション確認（cd不要・どこからでも実行可）
 
 ```bash
 tmux list-sessions
 ```
 
-- `multiagent-akasatanamidakuji` と `president-akasatanamidakuji` が**両方表示された** → そのまま「[セッションにアタッチ](#セッションにアタッチ)」へ
-- **表示されない/片方だけ** → 次の「初回 or セッションが消えたとき」へ
+- `multiagent-akasatanamidakuji` と `president-akasatanamidakuji` が**両方表示された** → そのまま「[セッションにアタッチ](#3-セッションにアタッチcd不要どこからでも実行可)」へ
+- **表示されない/片方だけ** → 次の「2. 初回 or セッションが消えたとき」へ
 
-### 初回 or セッションが消えたとき
+### 2. 初回 or セッションが消えたとき（要cd）
 
 ```bash
+cd ~/projects/akasatanamidakuji   # まだこのディレクトリにいなければ
 ./start.sh
 ```
 
 これ一つで、セッション作成・4体のClaude Code起動まで自動で終わる(既にセッションが生きている場合は何もせずアタッチ方法を表示するだけ)。PRESIDENTは`--continue`で起動するため、前回の会話があればそのまま再開する(初回は自動的に新規会話になる)。
 
-### セッションにアタッチ
+### 3. セッションにアタッチ（cd不要・どこからでも実行可）
 
 VSCodeのターミナルパネルでタブ(または画面分割)をもう1つ開き、それぞれ別タブで実行する(両方同時に見るため):
 
@@ -76,6 +85,8 @@ PRESIDENTのペインで、開発してほしい内容を直接伝える。ま�
 
 worker1〜3は同じ作業ツリーを同時編集すると壊れるため、それぞれ専用のgit worktree(兄弟ディレクトリ)で作業する。boss1がタスク割当時にworktreeを作成し、全員完了後にメインツリーへマージして後片付けする。
 
+⚠️ worktreeへの`cd`はラウンドごとに毎回発生する: boss1はマージ後に各workerのworktreeを削除し(後片付け)、次のタスクラウンドでは作り直す。そのためboss1→workerの指示メッセージには毎回`../akasatanamidakuji-workerN に移動し`が含まれ、workerは指示を受けるたびに`cd`から作業を始める(`instructions/worker.md`手順1)。
+
 各エージェントの役割別指示書: `instructions/president.md` / `instructions/boss.md` / `instructions/worker.md`(`CLAUDE.md`も参照)。
 
 ### 権限設定について
@@ -83,6 +94,8 @@ worker1〜3は同じ作業ツリーを同時編集すると壊れるため、そ
 実開発(ファイル編集・git操作・npm/テスト実行など)を行わせるには、Claude Codeの許可リストを広げる必要がある。workerごとに作業ディレクトリ(worktree)が異なるため、プロジェクト単位ではなく**ユーザーレベルの設定**(`~/.claude/settings.json`、WSLの場合はWSL側のホームディレクトリ)に許可を追加すること。危険な操作(`rm -rf`、force push等)は許可リストに含めない。
 
 ## 🔧 手動操作・デバッグ
+
+`./`で始まるコマンドと`cat ./tmp/...`は要cd(`cd ~/projects/akasatanamidakuji`)。`tmux`コマンドはcd不要。
 
 ```bash
 # メッセージを直接送る

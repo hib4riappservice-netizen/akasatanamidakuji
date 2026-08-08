@@ -15,7 +15,10 @@ echo "既存セッションが見つからないため、新規にセットア�
 
 echo ""
 echo "🤖 各ペインでClaude Codeを起動しています..."
-tmux send-keys -t "president-akasatanamidakuji" 'claude' C-m
+# PRESIDENTはこのディレクトリで唯一のセッションなので --continue で前回の会話を再開する
+# （初回や前回が無い場合は自動的に新規会話になる）。boss1/workerは全員同じディレクトリから
+# 起動するため --continue だと取り違える恐れがあり、常に新規会話にする。
+tmux send-keys -t "president-akasatanamidakuji" 'claude --continue' C-m
 tmux list-panes -t "multiagent-akasatanamidakuji:agents" -F '#{pane_id}' | while read pane; do
     tmux send-keys -t "$pane" 'claude' C-m
 done

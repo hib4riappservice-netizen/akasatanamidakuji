@@ -30,3 +30,7 @@ If you are developing a production application, we recommend enabling type-aware
 ```
 
 See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+
+## 自律型チーム開発
+
+このリポジトリには、複数のClaude Codeエージェント(PRESIDENT/boss1/worker1〜3)が要件整理からタスク分割・実装・レビュー・マージまでを自律的に進める仕組みが導入されています。使い方は [TEAM_DEV.md](TEAM_DEV.md) を参照してください。

@@ -207,9 +207,9 @@ function App() {
         <CategorySelector categories={pool.categories} selectedIds={selectedCategoryIds} onToggle={toggleCategory} />
       </div>
 
-      <main className="grid min-h-0 flex-1 place-items-center overflow-y-auto px-2">
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto px-2">
         {stage === 'idle' && (
-          <div className="flex flex-col items-center gap-5 px-6 text-center">
+          <div className="m-auto flex flex-col items-center gap-5 px-6 text-center">
             <div className="space-y-3">
               <p className="text-lg leading-relaxed font-semibold text-ink/70">「引く」を押してスタート！</p>
               <p className="text-xs whitespace-nowrap text-ink/40 sm:text-sm">あみだくじが出るので、1〜4のどれかを選んでね</p>

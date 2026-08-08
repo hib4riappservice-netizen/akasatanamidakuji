@@ -102,7 +102,7 @@ export function AmidaStage({
   const urgent = stagePhase === 'choosing' && secondsLeft <= 3;
 
   return (
-    <div className="flex flex-col items-center gap-1 px-3 py-1">
+    <div className="flex h-full min-h-0 flex-col items-center justify-center gap-1 px-3 py-1">
       <div className="flex h-12 w-full max-w-xs shrink-0 items-center justify-between sm:max-w-sm md:max-w-md lg:max-w-xl">
         <span className="text-xs font-medium text-ink/70 sm:text-sm">
           {stagePhase === 'choosing' ? '番号を選んでね（1〜4）' : '結果を確認中…'}
@@ -127,7 +127,7 @@ export function AmidaStage({
         )}
       </div>
 
-      <div className="flex h-[calc(100svh-285px)] w-full max-w-xs shrink-0 flex-col gap-1.5 rounded-2xl border border-ink/10 bg-board-panel p-2.5 shadow-sm sm:h-auto sm:max-w-sm sm:p-3 md:max-w-md lg:max-w-xl">
+      <div className="flex max-h-[37rem] w-full max-w-xs min-h-0 flex-1 flex-col gap-1.5 rounded-2xl border border-ink/10 bg-board-panel p-2.5 shadow-sm sm:max-w-sm sm:p-3 md:max-w-md lg:max-w-xl">
         <div className="grid shrink-0 gap-1" style={gridCols}>
           {Array.from({ length: lineCount }, (_, i) => (
             <button
@@ -148,7 +148,7 @@ export function AmidaStage({
         </div>
 
         <div
-          className="min-h-16 w-full flex-1 sm:h-[clamp(8rem,26dvh,20rem)] sm:flex-none"
+          className="min-h-16 max-h-[28rem] w-full flex-1"
           style={{ cursor: stagePhase !== 'choosing' ? 'pointer' : 'default' }}
           onClick={stagePhase !== 'choosing' ? onSkip : undefined}
         >

@@ -34,7 +34,7 @@ export function ResultDisplay({ modifier, userName, row, stage, finished, onDraw
   }
 
   return (
-    <div className="flex w-full max-w-xs flex-col gap-2 px-3 py-1 sm:max-w-sm md:max-w-md">
+    <div className="m-auto flex w-full max-w-xs flex-col gap-2 px-3 py-1 sm:max-w-sm md:max-w-md">
       {/* Fixed-height slot so the skip link appearing/disappearing never shifts the layout. */}
       <div className="h-5 text-right">
         <button

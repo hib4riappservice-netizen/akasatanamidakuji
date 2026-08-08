@@ -127,7 +127,7 @@ export function AmidaStage({
         )}
       </div>
 
-      <div className="flex w-full max-w-xs shrink-0 flex-col gap-1.5 rounded-2xl border border-ink/10 bg-board-panel p-2.5 shadow-sm sm:max-w-sm sm:p-3 md:max-w-md lg:max-w-xl">
+      <div className="flex h-[calc(100dvh-285px)] w-full max-w-xs shrink-0 flex-col gap-1.5 rounded-2xl border border-ink/10 bg-board-panel p-2.5 shadow-sm sm:h-auto sm:max-w-sm sm:p-3 md:max-w-md lg:max-w-xl">
         <div className="grid shrink-0 gap-1" style={gridCols}>
           {Array.from({ length: lineCount }, (_, i) => (
             <button
@@ -148,7 +148,7 @@ export function AmidaStage({
         </div>
 
         <div
-          className="h-[clamp(8rem,26dvh,20rem)] w-full shrink-0"
+          className="min-h-16 w-full flex-1 sm:h-[clamp(8rem,26dvh,20rem)] sm:flex-none"
           style={{ cursor: stagePhase !== 'choosing' ? 'pointer' : 'default' }}
           onClick={stagePhase !== 'choosing' ? onSkip : undefined}
         >

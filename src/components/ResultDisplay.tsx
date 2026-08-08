@@ -56,8 +56,11 @@ export function ResultDisplay({ modifier, userName, row, stage, finished, onDraw
             : 'border-dashed border-ink/20 bg-board-panel'
         }`}
       >
+        {/* `rare` only ever flips true at the very last reveal step (never mid-sequence), so
+            unlike the pause dots below, this is safe to render in normal flow — it just pushes
+            the text down instead of needing to be pinned in place. */}
         {rare && (
-          <div className="absolute top-3 left-0 w-full animate-pulse text-sm font-semibold tracking-widest text-amber-500">
+          <div className="mb-1 animate-pulse text-sm font-semibold tracking-widest text-amber-500">
             ✨ 激レア出現 ✨
           </div>
         )}

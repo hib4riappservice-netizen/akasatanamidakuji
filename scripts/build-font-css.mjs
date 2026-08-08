@@ -32,7 +32,16 @@ for (const { pkg, css } of SOURCES) {
     // Drop the woff fallback, keeping only the woff2 source.
     .replace(/,\s*url\([^)]*\.woff\)\s*format\('woff'\)/g, '')
     // Point ./files/... at the package inside node_modules, relative to src/fonts.css.
-    .replace(/url\(\.\/files\//g, `url(../node_modules/${pkg}/files/`);
+    .replace(/url\(\.\/files\//g, `url(../node_modules/${pkg}/files/`)
+    // swap always shows fallback text immediately, then re-renders once the matching
+    // unicode-range subset arrives — for dynamically generated text (this app draws
+    // random kanji from a pool), that means individual characters visibly pop from a
+    // system-font weight to the webfont's weight at random moments after first paint.
+    // optional makes the browser use the webfont only if it's already available (e.g.
+    // cached from an earlier draw in this session); otherwise it commits to the
+    // fallback for that paint instead of swapping mid-render, trading "always ends up
+    // in the exact right font" for "never visibly flickers".
+    .replace(/font-display:\s*swap;/g, 'font-display: optional;');
 
   out += `\n${rewritten}`;
 }

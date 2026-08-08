@@ -127,7 +127,7 @@ export function AmidaStage({
         )}
       </div>
 
-      <div className="flex h-[calc(100dvh-285px)] w-full max-w-xs shrink-0 flex-col gap-1.5 rounded-2xl border border-ink/10 bg-board-panel p-2.5 shadow-sm sm:h-auto sm:max-w-sm sm:p-3 md:max-w-md lg:max-w-xl">
+      <div className="flex h-[calc(100svh-285px)] w-full max-w-xs shrink-0 flex-col gap-1.5 rounded-2xl border border-ink/10 bg-board-panel p-2.5 shadow-sm sm:h-auto sm:max-w-sm sm:p-3 md:max-w-md lg:max-w-xl">
         <div className="grid shrink-0 gap-1" style={gridCols}>
           {Array.from({ length: lineCount }, (_, i) => (
             <button

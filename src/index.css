@@ -19,6 +19,18 @@
   color: var(--color-ink);
 }
 
+/* Some browsers ignore autocomplete="off" and still tint recognized fields
+   (e.g. a blue autofill background); repaint that background pale pink instead. */
+input:autofill,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-ink);
+  -webkit-box-shadow: 0 0 0 1000px #fce7f3 inset;
+  box-shadow: 0 0 0 1000px #fce7f3 inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 html,
 body,
 #root {

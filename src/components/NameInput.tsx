@@ -16,6 +16,7 @@ export function NameInput({ value, onChange }: NameInputProps) {
           id="userName"
           type="text"
           inputMode="text"
+          autoComplete="off"
           value={value}
           maxLength={MAX_LENGTH}
           placeholder="あなた"

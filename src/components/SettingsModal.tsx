@@ -51,6 +51,15 @@ export function SettingsModal({ open, settings, onChange, onClearHistory, onClos
           >
             履歴を全削除
           </button>
+
+          <div className="border-t border-ink/10 pt-4 text-xs leading-relaxed text-ink/50">
+            <p className="mb-1 font-medium text-ink/70">データの取り扱い</p>
+            <p>
+              入力されたユーザ名・履歴・設定は、お使いの端末内（ブラウザのローカルストレージ）にのみ保存され、
+              サーバーへ送信されることはありません。「履歴を全削除」またはブラウザのデータ消去でいつでも削除できます。
+              広告・アクセス解析・第三者へのデータ提供は行っていません。
+            </p>
+          </div>
         </div>
       </div>
     </div>

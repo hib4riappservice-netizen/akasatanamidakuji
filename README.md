@@ -34,3 +34,5 @@ See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rule
 ## 自律型チーム開発
 
 このリポジトリには、複数のClaude Codeエージェント(PRESIDENT/boss1/worker1〜3)が要件整理からタスク分割・実装・レビュー・マージまでを自律的に進める仕組みが導入されています。使い方は [TEAM_DEV.md](TEAM_DEV.md) を参照してください。
+
+⚠️ 使う前に: これは「もう作るものが決まっていて、実際に作る」ときの仕組み。何を作るか・どのくらいの規模かの判断基準は`~/projects`配下の全プロジェクト共通なので、`~/projects/README.md`（このマシンのローカル専用メモ）にまとめてあります。
